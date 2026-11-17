@@ -50,10 +50,58 @@ function fromPage() {
   })()
 }
 
-async function getJson(url, timeout = 12000) {
-  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), timeout)
-  try { const r = await fetch(url, { signal: ctl.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.json() } finally { clearTimeout(t) }
+
+let jsonpCounter = 0
+
+function getJson(url, timeout = 15000) {
+  return new Promise((resolve, reject) => {
+    const callbackName =
+      '__p4WorldAviaryFeed_' + Date.now() + '_' + (++jsonpCounter)
+
+    const script = document.createElement('script')
+    const feedUrl = new URL(url)
+
+    feedUrl.searchParams.set('alt', 'json-in-script')
+    feedUrl.searchParams.set('callback', callbackName)
+
+    let settled = false
+
+    const cleanup = () => {
+      clearTimeout(timer)
+      script.remove()
+      try {
+        delete window[callbackName]
+      } catch {
+        window[callbackName] = undefined
+      }
+    }
+
+    const finish = (error, data) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      if (error) reject(error)
+      else resolve(data)
+    }
+
+    const timer = setTimeout(() => {
+      finish(new Error('Blogger JSONP timeout'))
+    }, timeout)
+
+    window[callbackName] = (data) => {
+      finish(null, data)
+    }
+
+    script.async = true
+    script.onerror = () => {
+      finish(new Error('Blogger JSONP feed failed'))
+    }
+    script.src = feedUrl.toString()
+
+    document.head.appendChild(script)
+  })
 }
+
 
 export async function fetchFeed(blogUrl, { max = 150, limit = 2000, onPage } = {}) {
   const base = blogUrl.replace(/\/+$/, '')
