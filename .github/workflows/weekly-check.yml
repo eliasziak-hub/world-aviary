@@ -1,0 +1,19 @@
+# Προαιρετικό: εβδομαδιαίος αυτόματος έλεγχος του Blogger feed (δωρεάν, μέσω GitHub Actions).
+# Ανεβάστε τον φάκελο σε ένα αποθετήριο GitHub. Η αναφορά αποθηκεύεται στο reports/ και το seen.json ενημερώνεται.
+name: World-Aviary weekly check
+on:
+  schedule: [{ cron: '0 6 * * 1' }]   # κάθε Δευτέρα 06:00 UTC
+  workflow_dispatch: {}
+permissions: { contents: write }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: node tools/check-new-posts.mjs --blog https://poulia4.blogspot.com --seen seen.json --out reports --extra-genera extra-genera.txt --update-seen
+      - run: |
+          git config user.name "world-aviary-bot" && git config user.email "bot@users.noreply.github.com"
+          git add reports seen.json && git commit -m "Εβδομαδιαία αναφορά World-Aviary" || echo "καμία αλλαγή"
+          git push

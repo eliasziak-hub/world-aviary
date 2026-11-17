@@ -1,0 +1,27 @@
+{
+  "name": "poulia4-world-aviary",
+  "version": "1.0.0",
+  "description": "World-Aviary Explorer: διαδραστική υδρόγειος οικογενειών πουλιών για το poulia4.blogspot.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "build": "node build.mjs",
+    "data": "node tools/build-data.mjs",
+    "check": "node tools/check-new-posts.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "countries-list": "^3.4.1",
+    "d3-geo": "^3.1.2",
+    "esbuild": "^0.28.2",
+    "i18n-iso-countries": "^7.14.0",
+    "topojson-client": "^3.1.0",
+    "topojson-server": "^3.0.1",
+    "topojson-simplify": "^3.0.3",
+    "vitest": "^5.1.0",
+    "world-atlas": "^2.0.2"
+  },
+  "type": "module"
+}
