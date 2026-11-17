@@ -38,6 +38,7 @@ jobs:
         run: |
           mkdir -p site
           cp dist/poulia4-world-aviary-v1.html site/index.html
+          cp dist/poulia4-world-aviary-v1.js site/poulia4-world-aviary-v1.js
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
